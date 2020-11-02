@@ -1,0 +1,41 @@
+{
+  "name": "HelloWorld/lib",
+  "description": "This is library",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "type": "library",
+  "authors": [
+    {
+      "name": "BearZp",
+      "email": "gulidov.vadim@gmail.com"
+    }
+  ],
+  "keywords": [
+    "HelloWorld",
+    "Library",
+    "Logger"
+  ],
+  "autoload": {
+    "psr-4": {
+      "HelloWorld\\": "/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "": "/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  },
+  "require": {
+    "php": ">=7.1"
+  },
+  "config": {
+    "github-oauth": {
+      "github.com": "178a430dc70d662a35e445c70994cee23eb2ff75"
+    }
+  }
+}

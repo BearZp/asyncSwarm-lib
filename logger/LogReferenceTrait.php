@@ -6,7 +6,7 @@
  * Time: 12:41
  */
 
-namespace App\lib\logger;
+namespace Lib\logger;
 
 use Psr\Log\LoggerInterface;
 

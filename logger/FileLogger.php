@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\lib\logger;
+namespace Lib\logger;
 
 use Psr\Log\LogLevel;
 use Psr\Log\AbstractLogger;
