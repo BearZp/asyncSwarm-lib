@@ -11,7 +11,7 @@ namespace Lib\logger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\AbstractLogger;
 
-class LoggerCollection extends AbstractLogger implements LoggerInterface
+class MultiLogger extends AbstractLogger implements LoggerInterface
 {
     /** @var array */
     private $collection;
