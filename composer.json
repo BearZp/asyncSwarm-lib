@@ -13,8 +13,7 @@
   "keywords": [
     "HelloWorld",
     "Library",
-    "Logger"
-  ],
+    "Logger"  ],
   "autoload": {
     "psr-4": {
       "Lib\\": "/"
@@ -31,7 +30,9 @@
     }
   },
   "require": {
-    "php": ">=7.1"
+    "php": ">=7.1",
+    "ext-json": "*",
+    "ext-socket": "*"
   },
   "config": {
     "github-oauth": {
