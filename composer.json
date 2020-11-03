@@ -1,5 +1,5 @@
 {
-  "name": "HelloWorld/lib",
+  "name": "helloworld/lib",
   "description": "This is library",
   "minimum-stability": "stable",
   "license": "proprietary",
