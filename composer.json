@@ -32,7 +32,7 @@
   "require": {
     "php": ">=7.1",
     "ext-json": "*",
-    "ext-socket": "*"
+    "ext-sockets": "*"
   },
   "config": {
     "github-oauth": {
