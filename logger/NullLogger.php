@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 /**
  * Created by PhpStorm.
  * User: bearzp
- * Date: 03.11.20
- * Time: 17:17
+ * Date: 22.10.20
+ * Time: 13:18
  */
+
+declare(strict_types=1);
 
 namespace Lib\logger;
 
