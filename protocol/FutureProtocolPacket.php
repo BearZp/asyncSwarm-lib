@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Lib\protocol;
 
-use common\lib\models\FutureObjectTrait;
+use Lib\models\FutureObjectTrait;
 
 class FutureProtocolPacket implements ProtocolPacketInterface
 {
@@ -32,5 +32,23 @@ class FutureProtocolPacket implements ProtocolPacketInterface
     public function getPayload(): array
     {
         return $this->get()->getPayload();
+    }
+
+    /**
+     * @return array
+     * @throws \Throwable
+     */
+    public function getScope(): array
+    {
+        return $this->get()->getScope();
+    }
+
+    /**
+     * @return string
+     * @throws \Throwable
+     */
+    public function getResponseChanel(): string
+    {
+        return $this->get()->getResponseChanel();
     }
 }
