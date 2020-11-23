@@ -22,6 +22,9 @@ class ProtocolPacket implements ProtocolPacketInterface
     private $scope;
 
     /** @var string */
+    private $requestId;
+
+    /** @var string */
     private $responseChanel;
 
     /**
@@ -29,13 +32,20 @@ class ProtocolPacket implements ProtocolPacketInterface
      * @param string $action
      * @param array $payload
      * @param array $scope
+     * @param string $requestId
      * @param string|null $responseChanel
      */
-    public function __construct(string $action, array $payload, array $scope, string $responseChanel = null)
-    {
+    public function __construct(
+        string $action,
+        array $payload,
+        array $scope,
+        string $requestId,
+        string $responseChanel = null
+    ) {
         $this->action = $action;
         $this->payload = $payload;
         $this->scope = $scope;
+        $this->requestId = $requestId;
         $this->responseChanel = $responseChanel;
     }
 
@@ -61,6 +71,14 @@ class ProtocolPacket implements ProtocolPacketInterface
     public function getScope():array
     {
         return $this->scope;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestId(): string
+    {
+        return $this->requestId;
     }
 
     /**
