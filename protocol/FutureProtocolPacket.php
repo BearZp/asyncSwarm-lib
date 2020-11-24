@@ -29,9 +29,9 @@ class FutureProtocolPacket implements ProtocolPacketInterface
      * @return array
      * @throws \Throwable
      */
-    public function getPayload(): array
+    public function getData(): array
     {
-        return $this->get()->getPayload();
+        return $this->get()->getData();
     }
 
     /**
@@ -47,8 +47,8 @@ class FutureProtocolPacket implements ProtocolPacketInterface
      * @return string
      * @throws \Throwable
      */
-    public function getResponseChanel(): string
+    public function getRequestId(): string
     {
-        return $this->get()->getResponseChanel();
+        return $this->get()->getRequestId();
     }
 }

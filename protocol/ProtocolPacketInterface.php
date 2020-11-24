@@ -20,7 +20,7 @@ interface ProtocolPacketInterface
     /**
      * @return array
      */
-    public function getPayload(): array;
+    public function getData(): array;
 
     /**
      * @return array
@@ -30,5 +30,5 @@ interface ProtocolPacketInterface
     /**
      * @return string
      */
-    public function getResponseChanel(): string;
+    public function getRequestId(): string;
 }

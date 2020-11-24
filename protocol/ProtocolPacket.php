@@ -16,7 +16,7 @@ class ProtocolPacket implements ProtocolPacketInterface
     private $action;
 
     /** @var array */
-    private $payload;
+    private $data;
 
     /** @var array */
     private $scope;
@@ -24,29 +24,23 @@ class ProtocolPacket implements ProtocolPacketInterface
     /** @var string */
     private $requestId;
 
-    /** @var string */
-    private $responseChanel;
-
     /**
      * ProtocolPacket constructor.
      * @param string $action
-     * @param array $payload
+     * @param array $data
      * @param array $scope
      * @param string $requestId
-     * @param string|null $responseChanel
      */
     public function __construct(
         string $action,
-        array $payload,
+        array $data,
         array $scope,
-        string $requestId,
-        string $responseChanel = null
+        string $requestId
     ) {
         $this->action = $action;
-        $this->payload = $payload;
+        $this->data = $data;
         $this->scope = $scope;
         $this->requestId = $requestId;
-        $this->responseChanel = $responseChanel;
     }
 
     /**
@@ -60,9 +54,9 @@ class ProtocolPacket implements ProtocolPacketInterface
     /**
      * @return array
      */
-    public function getPayload(): array
+    public function getData(): array
     {
-        return $this->payload;
+        return $this->data;
     }
 
     /**
@@ -79,13 +73,5 @@ class ProtocolPacket implements ProtocolPacketInterface
     public function getRequestId(): string
     {
         return $this->requestId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getResponseChanel(): string
-    {
-        return $this->responseChanel;
     }
 }
