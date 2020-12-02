@@ -88,11 +88,11 @@ class AmqpProtocol implements ProtocolInterface
     public function catchPacket(string $answerBody): ProtocolPacketInterface
     {
         $answer = $this->decodePacket($answerBody);
-        if (!isset($answer['payload'])) {
-            throw new \InvalidArgumentException('$request[\'payload\'] is empty');
+        if (!isset($answer['data'])) {
+            throw new \InvalidArgumentException('$request[\'data\'] is empty');
         }
-        if (!\is_array($answer['payload'])) {
-            throw new \InvalidArgumentException('$request[\'payload\'] must be array, got ' . \gettype($answer['payload']));
+        if (!\is_array($answer['data'])) {
+            throw new \InvalidArgumentException('$request[\'data\'] must be array, got ' . \gettype($answer['data']));
         }
         if (isset($answer['error'])) {
             throw new \Exception($answer['error']);
