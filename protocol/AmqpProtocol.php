@@ -76,8 +76,33 @@ class AmqpProtocol implements ProtocolInterface
         );
         return new FutureProtocolPacket(function () use ($rabbitMqFuture) {
             $rabbitAnswer = $rabbitMqFuture->get();
-            return $this->createAnswer($rabbitAnswer);
+            return $this->catchPacket($rabbitAnswer);
         });
+    }
+
+    /**
+     * @param string $answerBody
+     * @return ProtocolPacketInterface
+     * @throws \Exception
+     */
+    public function catchPacket(string $answerBody): ProtocolPacketInterface
+    {
+        $answer = $this->decodePacket($answerBody);
+        if (!isset($answer['payload'])) {
+            throw new \InvalidArgumentException('$request[\'payload\'] is empty');
+        }
+        if (!\is_array($answer['payload'])) {
+            throw new \InvalidArgumentException('$request[\'payload\'] must be array, got ' . \gettype($answer['payload']));
+        }
+        if (isset($answer['error'])) {
+            throw new \Exception($answer['error']);
+        }
+        return new ProtocolPacket(
+            'Answer',
+            $answer['data'],
+            $answer['scope'],
+            $answer['requestId']
+        );
     }
 
     /**
@@ -103,43 +128,24 @@ class AmqpProtocol implements ProtocolInterface
         return $data;
     }
 
-    /**
-     * @param string $answerBody
-     * @return ProtocolPacketInterface
-     * @throws \Exception
-     */
-    public function createAnswer(string $answerBody): ProtocolPacketInterface
-    {
-        $answer = $this->decodePacket($answerBody);
-        if (!isset($answer['payload'])) {
-            throw new \InvalidArgumentException('$request[\'payload\'] is empty');
-        }
-        if (!\is_array($answer['payload'])) {
-            throw new \InvalidArgumentException('$request[\'payload\'] must be array, got ' . \gettype($answer['payload']));
-        }
-        if (isset($answer['error'])) {
-            throw new \Exception($answer['error']);
-        }
-        return new ProtocolPacket(
-            'Answer',
-            $answer['data'],
-            $answer['scope'],
-            $answer['requestId']
-        );
-    }
+
 
     /**
      * Encodes data before send
      * @param ProtocolPacketInterface $packet
      * @return string
      */
-    public function encodePacket(ProtocolPacketInterface $packet): string
+    private function encodePacket(ProtocolPacketInterface $packet): string
     {
-        return gzcompress(json_encode([
-            'action' => $packet->getAction(),
-            'data' => $packet->getData(),
-            'scope' => $packet->getScope(),
-            'requestId' => $packet->getRequestId()
-        ]));
+        return gzcompress(
+            json_encode(
+                [
+                    'action' => $packet->getAction(),
+                    'data' => $packet->getData(),
+                    'scope' => $packet->getScope(),
+                    'requestId' => $packet->getRequestId()
+                ]
+            )
+        );
     }
 }
