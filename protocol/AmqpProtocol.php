@@ -54,6 +54,7 @@ class AmqpProtocol implements ProtocolInterface
 
     /**
      * @param ProtocolPacketInterface $packet
+     * @param string|null $correlationId
      * @throws \Exception
      */
     public function pushPacket(ProtocolPacketInterface $packet, string $correlationId = null): void
