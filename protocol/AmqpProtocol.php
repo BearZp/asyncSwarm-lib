@@ -24,19 +24,25 @@ class AmqpProtocol implements ProtocolInterface
     private $clientTimeout;
     /** @var RabbitMqRpcClient|null */
     private $rpcClient;
+    /** @var bool  */
+    private $useRandomResponseQueue;
 
     /**
+     * AmqpProtocol constructor.
      * @param LazyRabbitMqConnectionProvider $provider
      * @param string $queueName
+     * @param bool $useRandomResponseQueue
      * @param float $clientTimeout
      */
     public function __construct(
         LazyRabbitMqConnectionProvider $provider,
         string $queueName,
+        bool $useRandomResponseQueue,
         float $clientTimeout
     ) {
         $this->lazyConnectionProvider = $provider;
         $this->queueName = $queueName;
+        $this->useRandomResponseQueue = $useRandomResponseQueue;
         $this->clientTimeout = $clientTimeout;
     }
 
@@ -77,7 +83,8 @@ class AmqpProtocol implements ProtocolInterface
             $this->queueName,
             $this->encodePacket($packet),
             [],
-            $this->clientTimeout
+            $this->clientTimeout,
+            $this->useRandomResponseQueue
         );
         return new FutureProtocolPacket(function () use ($rabbitMqFuture) {
             $rabbitAnswer = $rabbitMqFuture->get();

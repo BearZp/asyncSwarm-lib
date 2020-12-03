@@ -28,19 +28,23 @@ class RabbitMqRpcClient extends RabbitMqClient
      * @param string $body
      * @param array $meta
      * @param float|null $timeout
+     * @param bool $useRandomResponseQueue
      * @return RabbitMqFuture
      * @throws \Exception
      */
-    public function call(string $name, string $body, array $meta = [], float $timeout = null): RabbitMqFuture
-    {
+    public function call(
+        string $name,
+        string $body,
+        array $meta = [],
+        float $timeout = null,
+        bool $useRandomResponseQueue = false
+    ): RabbitMqFuture {
         if (empty($body)) {
             throw new \InvalidArgumentException('$body must be a not empty string');
         }
-
         $this->prepareQueue($name);
-
         $correlationId = uniqid('call', true) . random_int(10000, 99999);
-        $anonymousName = $this->makeAnonymousQueue();
+        $anonymousName = $this->makeAnonymousQueue($useRandomResponseQueue);
         $props = [
             'correlation_id' => $correlationId,
             'reply_to' => $anonymousName
@@ -65,16 +69,18 @@ class RabbitMqRpcClient extends RabbitMqClient
      * Utility method to create (if not created) and return name of temporary queue
      * @return string
      */
-    private function makeAnonymousQueue(): string
+    private function makeAnonymousQueue(bool $useRandomResponseQueue = false): string
     {
         if ($this->channel === null) {
             $this->channel = $this->connection->channel();
         }
-
         if ($this->anonymousCallbackQueue === null) {
+            $queueName = '';
+            if ($useRandomResponseQueue) {
+                $queueName = $this->uniqidReal(16);
+            }
 
-            $res = $this->channel->queue_declare('', false, false, true, false);
-
+            $res = $this->channel->queue_declare($queueName, false, false, true, false);
             $this->anonymousCallbackQueue = $res[0];
             $this->channel->basic_consume(
                 $this->anonymousCallbackQueue,
@@ -87,6 +93,23 @@ class RabbitMqRpcClient extends RabbitMqClient
             );
         }
         return $this->anonymousCallbackQueue;
+    }
+
+    /**
+     * @param int $length
+     * @return false|string
+     * @throws \Exception
+     */
+    private function uniqidReal($length = 13) {
+        // uniqid gives 13 chars, but you could adjust it to your needs.
+        if (function_exists("random_bytes")) {
+            $bytes = random_bytes(ceil($length / 2));
+        } elseif (function_exists("openssl_random_pseudo_bytes")) {
+            $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
+        } else {
+            throw new Exception("no cryptographically secure random function available");
+        }
+        return substr(bin2hex($bytes), 0, $length);
     }
 
     /**
