@@ -81,13 +81,13 @@ class AmqpProtocol implements ProtocolInterface
     }
 
     /**
-     * @param string $answerBody
+     * @param string $packetBody
      * @return ProtocolPacketInterface
      * @throws \Exception
      */
-    public function catchPacket(string $answerBody): ProtocolPacketInterface
+    public function catchPacket(string $packetBody): ProtocolPacketInterface
     {
-        $answer = $this->decodePacket($answerBody);
+        $answer = $this->decodePacket($packetBody);
         if (!isset($answer['data'])) {
             throw new \InvalidArgumentException('$request[\'data\'] is empty');
         }
@@ -98,7 +98,7 @@ class AmqpProtocol implements ProtocolInterface
             throw new \Exception($answer['error']);
         }
         return new ProtocolPacket(
-            'Answer',
+            $answer['action'],
             $answer['data'],
             $answer['scope'],
             $answer['requestId']
