@@ -65,11 +65,11 @@ class AmqpProtocol implements ProtocolInterface
      */
     public function pushPacket(ProtocolPacketInterface $packet, string $correlationId = null): void
     {
-        $meta = [];
+        $props = [];
         if ($correlationId !== null) {
-            $meta['correlation_id'] = $correlationId;
+            $props['correlation_id'] = $correlationId;
         }
-        $this->getRpcClient()->publish($this->queueName, $this->encodePacket($packet), $meta);
+        $this->getRpcClient()->publish($this->queueName, $this->encodePacket($packet), [], $props);
     }
 
     /**

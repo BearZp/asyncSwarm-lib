@@ -65,9 +65,10 @@ class RabbitMqClient
      * @param string $name
      * @param string $body
      * @param array $meta
+     * @param array $props
      * @return void
      */
-    public function publish(string $name, string $body, array $meta = [])
+    public function publish(string $name, string $body, array $meta = [], array $props = [])
     {
         if (empty($name)) {
             throw new \InvalidArgumentException('$name must be a not empty string');
@@ -76,13 +77,13 @@ class RabbitMqClient
             throw new \InvalidArgumentException('$body must be a not empty string');
         }
         $this->prepareQueue($name);
-        $props = [];
         if (count($meta) > 0) {
             $props['application_headers'] = [];
             foreach ($meta as $key => $value) {
                 $props['application_headers'][$key] = ['S', $value];
             }
         }
+
         $this->channel->basic_publish(new AMQPMessage($body, $props), '', $name);
     }
 
