@@ -72,7 +72,9 @@ class RabbitMqRpcClient extends RabbitMqClient
         }
 
         if ($this->anonymousCallbackQueue === null) {
+
             $res = $this->channel->queue_declare('', false, false, true, false);
+
             $this->anonymousCallbackQueue = $res[0];
             $this->channel->basic_consume(
                 $this->anonymousCallbackQueue,
