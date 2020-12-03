@@ -9,7 +9,7 @@
 
 namespace Lib\types\base;
 
-abstract class StrType implements TypeInterface
+abstract class Str implements TypeInterface
 {
     /** @var string */
     protected $str;
@@ -41,7 +41,7 @@ abstract class StrType implements TypeInterface
     }
 
     /**
-     * @param StrType $obj
+     * @param Str $obj
      * @return bool
      */
     public function isEqual(TypeInterface $obj): bool

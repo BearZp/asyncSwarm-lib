@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Lib\types;
 
-use Lib\types\base\BinaryType;
+use Lib\types\base\Str;
 
-class TextType extends BinaryType
+class Str255 extends Str
 {
     public function __construct(string $str)
     {
-        parent::__construct($str);
+        parent::__construct(0, 255, $str);
     }
 }

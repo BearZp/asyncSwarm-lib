@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Lib\queues\rabbitMq;
 
+use Lib\types\Uuid;
 use PhpAmqpLib\Exception\AMQPIOWaitException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -77,7 +78,7 @@ class RabbitMqRpcClient extends RabbitMqClient
         if ($this->anonymousCallbackQueue === null) {
             $queueName = '';
             if ($useRandomResponseQueue) {
-                $queueName = $this->uniqidReal(16);
+                $queueName = (new Uuid(''))->generateRandom()->toString();
             }
 
             $res = $this->channel->queue_declare($queueName, false, false, false, false);
@@ -96,23 +97,6 @@ class RabbitMqRpcClient extends RabbitMqClient
     }
 
     /**
-     * @param int $length
-     * @return false|string
-     * @throws \Exception
-     */
-    private function uniqidReal(int $length = 13) {
-        // uniqid gives 13 chars, but you could adjust it to your needs.
-        if (function_exists("random_bytes")) {
-            $bytes = random_bytes((int) ceil($length / 2));
-        } elseif (function_exists("openssl_random_pseudo_bytes")) {
-            $bytes = openssl_random_pseudo_bytes((int) ceil($length / 2));
-        } else {
-            throw new Exception("no cryptographically secure random function available");
-        }
-        return substr(bin2hex($bytes), 0, $length);
-    }
-
-    /**
      * @param AMQPMessage $rep
      */
     public function onMessage(AMQPMessage $rep)
@@ -120,6 +104,11 @@ class RabbitMqRpcClient extends RabbitMqClient
         if (isset($this->cMap[$rep->get('correlation_id')])) {
             $this->cMap[$rep->get('correlation_id')]->complete($rep->body);
             unset($this->cMap[$rep->get('correlation_id')]);
+        }
+
+        if ($this->anonymousCallbackQueue) {
+            $this->connection->channel()->queue_delete($this->anonymousCallbackQueue);
+            $this->anonymousCallbackQueue = null;
         }
     }
 

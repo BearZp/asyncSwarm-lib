@@ -11,7 +11,7 @@ namespace Lib\types;
 
 use Lib\types\base\TypeInterface;
 
-class BinaryType implements TypeInterface
+class Binary implements TypeInterface
 {
     /** @var string */
     protected $str;

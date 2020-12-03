@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Lib\types;
 
-class UuidType
+class Uuid
 {
     /**
      * @var string
@@ -58,5 +58,22 @@ class UuidType
     public function isEqual($uuid): bool
     {
         return $this->uuid === $uuid->toString();
+    }
+
+    /**
+     * @param int $length
+     * @return self
+     * @throws \Exception
+     */
+    public function generateRandom(int $length = 32): self
+    {
+        if (function_exists("random_bytes")) {
+            $bytes = random_bytes((int) ceil($length / 2));
+        } elseif (function_exists("openssl_random_pseudo_bytes")) {
+            $bytes = openssl_random_pseudo_bytes((int) ceil($length / 2));
+        } else {
+            throw new Exception("no cryptographically secure random function available");
+        }
+        return new Uuid($bytes);
     }
 }

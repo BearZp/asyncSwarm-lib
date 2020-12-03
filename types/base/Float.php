@@ -10,19 +10,21 @@ declare(strict_types=1);
 
 namespace Lib\types\base;
 
-abstract class IntType implements TypeInterface
+abstract class Float implements TypeInterface
 {
-    /** @var int */
+    /** @var float */
     protected $value;
 
+    /** @var int */
+    protected $precision;
+
     /**
-     * Str constructor.
-     * @param int $min
-     * @param int $max
-     * @param int $value
-     * @throws \InvalidArgumentException
+     * @param int   $min
+     * @param int   $max
+     * @param int   $precision
+     * @param float $value
      */
-    public function __construct(int $min, int $max, int $value)
+    public function __construct(int $min, int $max, int $precision, float $value)
     {
         if ($min > $value || $value > $max) {
             throw new \InvalidArgumentException(
@@ -30,6 +32,15 @@ abstract class IntType implements TypeInterface
             );
         }
         $this->value = $value;
+        $this->precision = $precision;
+    }
+
+    /**
+     * @return float
+     */
+    public function toFloat(): float
+    {
+        return round($this->value, $this->precision);
     }
 
     /**
@@ -37,11 +48,11 @@ abstract class IntType implements TypeInterface
      */
     public function toInteger(): int
     {
-        return $this->value;
+        return (int) $this->toFloat();
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function toString(): string
     {
@@ -54,6 +65,6 @@ abstract class IntType implements TypeInterface
      */
     public function isEqual(TypeInterface $obj): bool
     {
-        return $obj instanceof static and $this->value === $obj->value;
+        return $obj instanceof static and $this->precision = $obj->precision and $this->value = $obj->value;
     }
 }

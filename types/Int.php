@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Lib\types;
 
-use Lib\types\base\IntType as BaseIntType;
+use Lib\types\base\Int as BaseIntType;
 
-class IntType extends BaseIntType
+class Int extends BaseIntType
 {
     public function __construct(int $value)
     {
