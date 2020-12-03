@@ -80,7 +80,7 @@ class RabbitMqRpcClient extends RabbitMqClient
                 $queueName = $this->uniqidReal(16);
             }
 
-            $res = $this->channel->queue_declare($queueName, false, false, true, false);
+            $res = $this->channel->queue_declare($queueName, false, false, false, false);
             $this->anonymousCallbackQueue = $res[0];
             $this->channel->basic_consume(
                 $this->anonymousCallbackQueue,
@@ -100,12 +100,12 @@ class RabbitMqRpcClient extends RabbitMqClient
      * @return false|string
      * @throws \Exception
      */
-    private function uniqidReal($length = 13) {
+    private function uniqidReal(int $length = 13) {
         // uniqid gives 13 chars, but you could adjust it to your needs.
         if (function_exists("random_bytes")) {
-            $bytes = random_bytes(ceil($length / 2));
+            $bytes = random_bytes((int) ceil($length / 2));
         } elseif (function_exists("openssl_random_pseudo_bytes")) {
-            $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
+            $bytes = openssl_random_pseudo_bytes((int) ceil($length / 2));
         } else {
             throw new Exception("no cryptographically secure random function available");
         }
