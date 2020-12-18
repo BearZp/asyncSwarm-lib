@@ -10,12 +10,14 @@ declare(strict_types=1);
 
 namespace Lib\queues\rabbitMq;
 
+use Lib\transport\FutureAnswerBundleInterface;
+use Lib\transport\RpcClientInterface;
 use Lib\types\Uuid;
 use PhpAmqpLib\Exception\AMQPIOWaitException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class RabbitMqRpcClient extends RabbitMqClient
+class RabbitMqRpcClient extends RabbitMqClient implements RpcClientInterface
 {
     /** @var string */
     private $anonymousCallbackQueue;
@@ -39,7 +41,7 @@ class RabbitMqRpcClient extends RabbitMqClient
         array $meta = [],
         float $timeout = null,
         bool $useRandomResponseQueue = false
-    ): RabbitMqFuture {
+    ): FutureAnswerBundleInterface {
         if (empty($body)) {
             throw new \InvalidArgumentException('$body must be a not empty string');
         }
@@ -68,7 +70,10 @@ class RabbitMqRpcClient extends RabbitMqClient
 
     /**
      * Utility method to create (if not created) and return name of temporary queue
+     *
+     * @param bool $useRandomResponseQueue
      * @return string
+     * @throws \Exception
      */
     private function makeAnonymousQueue(bool $useRandomResponseQueue = false): string
     {

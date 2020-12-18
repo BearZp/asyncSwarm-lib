@@ -33,27 +33,27 @@ class LazyRabbitMqConnectionProvider
      * @param int $port
      * @param string $user
      * @param string $pass
-     * @param string $vhost
+     * @param string $path
      */
     public function __construct(
         string $host,
         int $port,
         string $user,
         string $pass,
-        string $vhost
+        string $path
     ) {
         $this->host = $host;
         $this->port = $port;
         $this->user = $user;
         $this->pass = $pass;
-        $this->vhost = $vhost;
+        $this->vhost = $path;
     }
 
     /**
      * @return AbstractConnection
      * @throws \Exception
      */
-    public function getConnection():AbstractConnection
+    public function getConnection(): AbstractConnection
     {
         if ($this->connection === null) {
             try {

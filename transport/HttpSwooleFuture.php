@@ -8,17 +8,10 @@
 
 declare(strict_types=1);
 
-namespace Lib\queues\rabbitMq;
+namespace Lib\transport;
 
-use Lib\transport\FutureAnswerBundleInterface;
-use Lib\transport\RpcClientInterface;
-
-class RabbitMqFuture implements FutureAnswerBundleInterface
+class HttpSwooleFuture implements FutureAnswerBundleInterface
 {
-    /**
-     * @var RabbitMqRpcClient
-     */
-    private $provider;
     /**
      * @var boolean
      */
@@ -47,6 +40,10 @@ class RabbitMqFuture implements FutureAnswerBundleInterface
      * @var string
      */
     private $queueName;
+    /**
+     * @var RpcClientInterface
+     */
+    private $provider;
 
     /**
      * Constructor
@@ -58,25 +55,29 @@ class RabbitMqFuture implements FutureAnswerBundleInterface
     public function __construct(RpcClientInterface $rpc, string $queueName, float $timeout = .0)
     {
         $this->done = false;
-        $this->provider = $rpc;
         $this->startedAt = microtime(true);
         if ($timeout > 0) {
             $this->timeoutAt = $this->startedAt + $timeout;
         }
+        $this->provider = $rpc;
         $this->queueName = $queueName;
     }
 
     /**
      * Set current future value
      * @param string $data
+     * @return $this
+     * @throws \Exception
      */
-    public function complete(string $data)
+    public function complete(string $data): self
     {
         if (!$this->done) {
             $this->done = true;
             $this->data = $data;
             $this->doneAt = microtime(true);
+            return $this;
         }
+        throw new \Exception("Already completed. Current data is: $this->data, try to set new data: $data");
     }
 
     /**
@@ -88,7 +89,7 @@ class RabbitMqFuture implements FutureAnswerBundleInterface
     {
         while (!$this->done) {
             if ($this->timeoutAt !== null && microtime(true) > $this->timeoutAt) {
-                throw new \Exception('Time out');
+                throw new \Exception('Time out while getting response');
             }
             $this->provider->wait();
         }
@@ -99,7 +100,7 @@ class RabbitMqFuture implements FutureAnswerBundleInterface
      * @param \Exception $error
      * @return $this
      */
-    public function setError(\Exception $error): self
+    public function setError(\Exception $error): FutureAnswerBundleInterface
     {
         $this->done = true;
         $this->error = $error;
@@ -109,7 +110,6 @@ class RabbitMqFuture implements FutureAnswerBundleInterface
 
     /**
      * @return \Exception
-     * @throws \ErrorException
      */
     public function getError(): \Exception
     {
@@ -141,15 +141,5 @@ class RabbitMqFuture implements FutureAnswerBundleInterface
     public function getLatency(): float
     {
         return $this->doneAt - $this->startedAt;
-    }
-
-    /**
-     * Returns queue name
-     * @internal For internal usage only, do not invoke this method
-     * @return string
-     */
-    public function getQueueName(): string
-    {
-        return $this->queueName;
     }
 }
