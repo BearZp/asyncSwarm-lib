@@ -122,7 +122,7 @@ class RabbitMqRpcClient extends RabbitMqClient implements RpcClientInterface
      *
      * @throws \ErrorException
      */
-    public function wait()
+    public function wait(): void
     {
         if ($this->channel !== null) {
             try {
