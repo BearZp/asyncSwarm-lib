@@ -52,7 +52,7 @@ class HttpProtocol implements ProtocolInterface
      */
     public function pushPacket(ProtocolPacketInterface $packet): void
     {
-        $this->client->call(
+        $this->getRpcClient()->call(
             $packet->getAction(),
             $this->encodePacket($packet),
             [],
@@ -67,7 +67,7 @@ class HttpProtocol implements ProtocolInterface
      */
     public function sendPacket(ProtocolPacketInterface $packet): ProtocolPacketInterface
     {
-        $response = $this->client->call(
+        $response = $this->getRpcClient()->call(
             $packet->getAction(),
             $this->encodePacket($packet),
             [],
