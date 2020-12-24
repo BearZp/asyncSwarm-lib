@@ -2,9 +2,9 @@
 
 namespace Lib\curl;
 
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
-class Event extends SymfonyEvent
+class Event extends GenericEvent
 {
     /**
      * @var Response
