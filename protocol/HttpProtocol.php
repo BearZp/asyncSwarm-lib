@@ -41,7 +41,7 @@ class HttpProtocol implements ProtocolInterface
     public function getRpcClient(): RpcClientInterface
     {
         if ($this->rpcClient === null) {
-            $this->rpcClient = new HttpSwooleRpcClient($this->lazyConnectionProvider->getConnection(), false);
+            $this->rpcClient = new HttpRpcClient($this->lazyConnectionProvider->getConnection(), false);
         }
         return $this->rpcClient;
     }
