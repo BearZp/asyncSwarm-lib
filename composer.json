@@ -1,6 +1,6 @@
 {
-  "name": "helloworld/lib",
-  "description": "This is library",
+  "name": "asyncswarm/lib",
+  "description": "This is a library",
   "minimum-stability": "stable",
   "license": "proprietary",
   "type": "library",
@@ -11,9 +11,7 @@
     }
   ],
   "keywords": [
-    "HelloWorld",
-    "Library",
-    "Logger"
+    "asyncSwarm"
   ],
   "autoload": {
     "psr-4": {
