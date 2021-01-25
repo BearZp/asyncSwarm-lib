@@ -43,6 +43,7 @@ class HttpSwooleRpcClient implements RpcClientInterface
         $meta['Accept-Encoding'] = $meta['Accept-Encoding'] ?? 'gzip';
 
         $resp = new HttpSwooleFuture($this, '', $timeout);
+
         Co\run(function() use ($resp, $path, $meta, $body) {
             $cli = new Client($this->provider->getHost(), $this->provider->getPort());
             $cli->setHeaders($meta);
