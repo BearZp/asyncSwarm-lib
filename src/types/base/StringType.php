@@ -9,7 +9,7 @@
 
 namespace Lib\types\base;
 
-abstract class Str implements TypeInterface
+abstract class StringType implements TypeInterface
 {
     /** @var string */
     protected $str;

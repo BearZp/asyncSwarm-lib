@@ -12,7 +12,7 @@ namespace Lib\types;
 
 use Lib\types\base\TypeInterface;
 
-class Url implements TypeInterface
+class UrlType implements TypeInterface
 {
     /** @var string */
     private $url;

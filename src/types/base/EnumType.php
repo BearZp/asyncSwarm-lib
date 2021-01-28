@@ -6,7 +6,7 @@ namespace Lib\types\base;
  * Class Enum
  * @package common\lib\types
  */
-abstract class Enum implements TypeInterface
+abstract class EnumType implements TypeInterface
 {
     /** @var array -- \ReflectionClass cache */
     private static $map = [];

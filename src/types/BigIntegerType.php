@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Lib\types;
 
-use Lib\types\base\Int;
+use Lib\types\base\IntegerType;
 
-class BigInt extends Int
+class BigIntegerType extends IntegerType
 {
     public function __construct(int $value)
     {

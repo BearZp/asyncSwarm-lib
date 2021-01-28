@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Lib\types;
 
-class Uuid
+class UuidType
 {
     /**
      * @var string

@@ -12,7 +12,7 @@ namespace Lib\types;
 
 use Lib\types\base\TypeInterface;
 
-class Email implements TypeInterface
+class EmailType implements TypeInterface
 {
     /**
      * @var string

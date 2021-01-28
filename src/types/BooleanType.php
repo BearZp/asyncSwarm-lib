@@ -5,7 +5,7 @@ namespace Lib\types;
 
 use Lib\types\base\TypeInterface;
 
-class Bool implements TypeInterface
+class BooleanType implements TypeInterface
 {
     /** @var bool */
     private $value;
