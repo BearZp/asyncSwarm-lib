@@ -141,13 +141,14 @@ abstract class EnumType implements TypeInterface
     public function isEqual(TypeInterface $to): bool
     {
         if ($to === null) {
-            return false;
-        }
-        if (\is_object($to) && $to instanceof static) {
-            return $this->value === $to->value;
+            $returnVal = false;
+        } elseif (\is_object($to) && $to instanceof static) {
+            $returnVal = ($this->value === $to->value);
+        } else {
+            $returnVal = ($this->value == $to->toString());
         }
 
-        return $this->value === $to;
+        return $returnVal;
     }
 
     /**

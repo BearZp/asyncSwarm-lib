@@ -18,14 +18,14 @@ interface ProtocolPacketInterface
     public function getAction(): string;
 
     /**
-     * @return array
+     * @return object
      */
-    public function getData(): array;
+    public function getData(): object;
 
     /**
-     * @return array
+     * @return object
      */
-    public function getScope():array;
+    public function getScope():object;
 
     /**
      * @return string

@@ -8,9 +8,8 @@
 
 declare(strict_types=1);
 
-namespace common\lib\logger;
+namespace Lib\logger;
 
-use Lib\logger\AbstractLogger;
 use Lib\transport\TransportInterface;
 use Psr\Log\LoggerInterface;
 

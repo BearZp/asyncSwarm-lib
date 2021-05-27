@@ -15,10 +15,10 @@ class ProtocolPacket implements ProtocolPacketInterface
     /** @var string */
     private $action;
 
-    /** @var array */
+    /** @var object */
     private $data;
 
-    /** @var array */
+    /** @var object */
     private $scope;
 
     /** @var string */
@@ -27,14 +27,14 @@ class ProtocolPacket implements ProtocolPacketInterface
     /**
      * ProtocolPacket constructor.
      * @param string $action
-     * @param array $data
-     * @param array $scope
+     * @param object $data
+     * @param object $scope
      * @param string $requestId
      */
     public function __construct(
         string $action,
-        array $data,
-        array $scope,
+        object $data,
+        object $scope,
         string $requestId
     ) {
         $this->action = $action;
@@ -52,17 +52,17 @@ class ProtocolPacket implements ProtocolPacketInterface
     }
 
     /**
-     * @return array
+     * @return object
      */
-    public function getData(): array
+    public function getData(): object
     {
         return $this->data;
     }
 
     /**
-     * @return array
+     * @return object
      */
-    public function getScope():array
+    public function getScope():object
     {
         return $this->scope;
     }
@@ -73,5 +73,15 @@ class ProtocolPacket implements ProtocolPacketInterface
     public function getRequestId(): string
     {
         return $this->requestId;
+    }
+
+    public function toString(): string
+    {
+        return json_encode([
+            'action' => $this->action,
+            'data' => $this->data,
+            'scope' => $this->scope,
+            'request_id' => $this->requestId,
+        ]);
     }
 }

@@ -67,13 +67,13 @@ class UuidType
      */
     public function generateRandom(int $length = 32): self
     {
-        if (function_exists("random_bytes")) {
+        if (function_exists('random_bytes')) {
             $bytes = random_bytes((int) ceil($length / 2));
-        } elseif (function_exists("openssl_random_pseudo_bytes")) {
+        } elseif (function_exists('openssl_random_pseudo_bytes')) {
             $bytes = openssl_random_pseudo_bytes((int) ceil($length / 2));
         } else {
-            throw new Exception("no cryptographically secure random function available");
+            throw new \Exception('no cryptographically secure random function available');
         }
-        return new Uuid($bytes);
+        return new UuidType($bytes);
     }
 }

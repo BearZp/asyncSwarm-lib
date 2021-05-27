@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Lib\curl;
 
 use Lib\transport\FutureAnswerBundleInterface;

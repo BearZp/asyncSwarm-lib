@@ -6,11 +6,18 @@ namespace Lib\collection;
 use Lib\exception\NotInstanceOfException;
 use Lib\models\FutureObjectInterface;
 use Lib\models\FutureObjectTrait;
+use Throwable;
+use InvalidArgumentException;
+use OutOfBoundsException;
+use Countable;
+use ArrayAccess;
+use Iterator;
+use LogicException;
 
-abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, \Iterator, FutureObjectInterface
+abstract class AbstractImmutableCollection implements Countable, ArrayAccess, Iterator, FutureObjectInterface
 {
     use FutureObjectTrait {
-        get as futureObjectTraitGet;
+        FutureObjectTrait::get as futureObjectTraitGet;
     }
 
     /** @var null|mixed[] */
@@ -18,21 +25,21 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @param array|callable $data
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct($data)
     {
-        if (\is_callable($data)) {
+        if (is_callable($data)) {
             $this->initFunction = $data;
-        } elseif (\is_array($data)) {
+        } elseif (is_array($data)) {
             $this->initFunction = function () use ($data) {
                 return $data;
             };
         } else {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 '$data',
                 'Argument $data must be array or callable',
-                \gettype($data)
+                gettype($data)
             );
         }
     }
@@ -48,28 +55,28 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @return int
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function count(): int
     {
         $this->initCollection();
-        return \count($this->collection);
+        return count($this->collection);
     }
 
     /**
      * @return bool
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function isEmpty(): bool
     {
         $this->initCollection();
-        return \count($this->collection) === 0;
+        return count($this->collection) === 0;
     }
 
     /**
      * @param int $offset
      * @return bool
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function offsetExists($offset): bool
     {
@@ -81,13 +88,13 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
      *
      * @param int $offset
      * @return mixed
-     * @throws \InvalidArgumentException
-     * @throws \OutOfBoundsException
+     * @throws InvalidArgumentException
+     * @throws OutOfBoundsException
      */
     public function offsetGet($offset)
     {
         if (!$this->offsetExists($offset)) {
-            throw new \OutOfBoundsException('Unable to find value with key ' . $offset);
+            throw new OutOfBoundsException('Unable to find value with key ' . $offset);
         }
         return $this->collection[$offset];
     }
@@ -96,26 +103,26 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
      * @param string|int $offset
      * @param mixed $value
      * @return void
-     * @throws \LogicException Always throws an exception
+     * @throws LogicException Always throws an exception
      */
     public function offsetSet($offset, $value): void
     {
-        throw new \LogicException('Unable to change contents of immutable collection');
+        throw new LogicException('Unable to change contents of immutable collection');
     }
 
     /**
      * @param int $offset
      * @return void
-     * @throws \LogicException Always throws an exception
+     * @throws LogicException Always throws an exception
      */
     public function offsetUnset($offset):void
     {
-        throw new \LogicException('Unable to change contents of immutable array');
+        throw new LogicException('Unable to change contents of immutable array');
     }
 
     /**
      * @return mixed
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function current()
     {
@@ -125,7 +132,7 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @return mixed
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function next()
     {
@@ -135,7 +142,7 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @return int
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function key(): int
     {
@@ -145,7 +152,7 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @return bool
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function valid(): bool
     {
@@ -155,7 +162,7 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function rewind(): void
     {
@@ -165,7 +172,7 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
 
     /**
      * @return array
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function toArray(): array
     {
@@ -174,20 +181,24 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
     }
 
     /**
-     * @return void
-     * @throws \InvalidArgumentException
+     * @throws Throwable
      */
     final public function initCollection(): void
     {
         if ($this->collection === null) {
-            $this->addData($this->futureObjectTraitGet());
+            $data = $this->futureObjectTraitGet();
+            if ($data instanceof static) {
+                $data->initCollection();
+                $data = $data->collection;
+            }
+            $this->addData($data);
             $this->object = null;
         }
     }
 
     /**
      * @param array $list
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return void
      */
     protected function addData(array $list): void
@@ -202,7 +213,7 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
     /**
      * @param mixed $value
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     abstract public function validate($value): void;
 
@@ -223,10 +234,10 @@ abstract class AbstractImmutableCollection implements \Countable, \ArrayAccess, 
             throw new NotInstanceOfException(
                 '$object',
                 static::class,
-                \is_object($collection) ? \get_class($collection) : \gettype($collection)
+                is_object($collection) ? get_class($collection) : gettype($collection)
             );
         }
-        return new static(\array_merge($this->toArray(), $collection->toArray()));
+        return new static(array_merge($this->toArray(), $collection->toArray()));
     }
 
     /**

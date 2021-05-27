@@ -41,7 +41,7 @@ abstract class StringType implements TypeInterface
     }
 
     /**
-     * @param Str $obj
+     * @param TypeInterface $obj
      * @return bool
      */
     public function isEqual(TypeInterface $obj): bool

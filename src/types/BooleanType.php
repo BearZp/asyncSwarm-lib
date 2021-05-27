@@ -7,7 +7,7 @@ use Lib\types\base\TypeInterface;
 
 class BooleanType implements TypeInterface
 {
-    /** @var bool */
+    /** @var boolean */
     private $value;
 
     /**
@@ -29,7 +29,7 @@ class BooleanType implements TypeInterface
      */
     public function isTrue(): bool
     {
-        return $this === true;
+        return $this->value === true;
     }
 
     /**
@@ -37,7 +37,7 @@ class BooleanType implements TypeInterface
      */
     public function toString(): string
     {
-        return $this ? 'true' : 'false';
+        return $this->isTrue() ? 'true' : 'false';
     }
 
     /**

@@ -12,7 +12,7 @@ namespace Lib\queues\rabbitMq;
 
 use Lib\transport\FutureAnswerBundleInterface;
 use Lib\transport\RpcClientInterface;
-use Lib\types\Uuid;
+use Lib\types\UuidType;
 use PhpAmqpLib\Exception\AMQPIOWaitException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -83,7 +83,7 @@ class RabbitMqRpcClient extends RabbitMqClient implements RpcClientInterface
         if ($this->anonymousCallbackQueue === null) {
             $queueName = '';
             if ($useRandomResponseQueue) {
-                $queueName = (new Uuid(''))->generateRandom()->toString();
+                $queueName = (new UuidType(''))->generateRandom()->toString();
             }
 
             $res = $this->channel->queue_declare($queueName, false, false, false, false);
