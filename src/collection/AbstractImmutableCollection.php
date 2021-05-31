@@ -1,53 +1,65 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
-namespace Lib\collection;
+namespace Gronvi\FutureObject\Collection;
 
-use Lib\exception\NotInstanceOfException;
-use Lib\models\FutureObjectInterface;
-use Lib\models\FutureObjectTrait;
-use Throwable;
-use InvalidArgumentException;
-use OutOfBoundsException;
-use Countable;
 use ArrayAccess;
+use Countable;
+use lib\models\FutureObjectInterface;
+use lib\models\FutureObjectTrait;
+use InvalidArgumentException;
 use Iterator;
 use LogicException;
+use OutOfBoundsException;
 
 abstract class AbstractImmutableCollection implements Countable, ArrayAccess, Iterator, FutureObjectInterface
 {
     use FutureObjectTrait {
-        FutureObjectTrait::get as futureObjectTraitGet;
+        get as futureObjectTraitGet;
     }
 
     /** @var null|mixed[] */
     protected $collection;
 
+    protected $firstItemKey;
+
     /**
-     * @param array|callable $data
-     * @throws InvalidArgumentException
+     * AbstractImmutableCollection constructor.
+     * @param array|self|callable $data
+     * @throws \Throwable
      */
     public function __construct($data)
     {
         if (is_callable($data)) {
             $this->initFunction = $data;
         } elseif (is_array($data)) {
-            $this->initFunction = function () use ($data) {
-                return $data;
-            };
+            $this->object = [];
+            $this->addData($data);
+        } elseif ($data instanceof self) {
+            if ($data->isCompleted()) {
+                $this->addData($data);
+                $this->object = [];
+            } else {
+                $this->initFunction = static function () use ($data) {
+                    if ($data instanceof FutureObjectInterface) {
+                        while (!$data->isCompleted()) {
+                            yield;
+                        }
+                    }
+                    return $data;
+                };
+            }
         } else {
             throw new InvalidArgumentException(
-                '$data',
-                'Argument $data must be array or callable',
-                gettype($data)
+                'Argument $data must be array, collection or callable. Received: '
+                . (is_object($data) ? get_class($data) : gettype($data))
             );
         }
     }
 
     /**
-     * @return AbstractImmutableCollection
+     * @return self
      */
-    public function get(): AbstractImmutableCollection
+    public function get(): self
     {
         $this->initCollection();
         return $this;
@@ -61,6 +73,18 @@ abstract class AbstractImmutableCollection implements Countable, ArrayAccess, It
     {
         $this->initCollection();
         return count($this->collection);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFirstItem()
+    {
+        $this->initCollection();
+        if ($this->firstItemKey === null) {
+            throw new LogicException('Collection is empty');
+        }
+        return $this->collection[$this->firstItemKey];
     }
 
     /**
@@ -111,7 +135,7 @@ abstract class AbstractImmutableCollection implements Countable, ArrayAccess, It
     }
 
     /**
-     * @param int $offset
+     * @param string|int $offset
      * @return void
      * @throws LogicException Always throws an exception
      */
@@ -181,32 +205,58 @@ abstract class AbstractImmutableCollection implements Countable, ArrayAccess, It
     }
 
     /**
-     * @throws Throwable
+     * @return void
+     * @throws InvalidArgumentException
      */
     final public function initCollection(): void
     {
         if ($this->collection === null) {
-            $data = $this->futureObjectTraitGet();
-            if ($data instanceof static) {
-                $data->initCollection();
-                $data = $data->collection;
-            }
-            $this->addData($data);
-            $this->object = null;
+            $this->addData($this->futureObjectTraitGet());
+            $this->object = [];
+        }
+        if ($this->firstItemKey === null && count($this->collection) !== 0) {
+            reset($this->collection);
+            $this->firstItemKey = key($this->collection);
         }
     }
 
     /**
-     * @param array $list
+     * @param $list
      * @throws InvalidArgumentException
      * @return void
      */
-    protected function addData(array $list): void
+    protected function addData($list): void
     {
-        $this->collection = [];
-        foreach ($list as $item) {
-            $this->validate($item);
-            $this->collection[] = $item;
+        if (is_array($list)) {
+            $this->collection = [];
+            foreach ($list as $item) {
+                $this->validate($item);
+                $this->collection[] = $item;
+            }
+        } else {
+            if (!($list instanceof static)) {
+                $type = is_object($list) ? get_class($list) : gettype($list);
+                throw new InvalidArgumentException(
+                    'Argument $list must be instance of ' . static::class
+                    . " Variable of type `{$type}` supplied instead"
+                );
+            }
+            $this->collection = $list->toArray();
+        }
+    }
+
+    /**
+     * @param $item
+     */
+    protected function addItem($item): void
+    {
+        if ($this->collection === null) {
+            $this->collection = [];
+        }
+        $this->validate($item);
+        $this->collection[] = $item;
+        if ($this->firstItemKey === null) {
+            $this->firstItemKey = 0;
         }
     }
 
@@ -217,13 +267,6 @@ abstract class AbstractImmutableCollection implements Countable, ArrayAccess, It
      */
     abstract public function validate($value): void;
 
-    /**  */
-    public function getClone()
-    {
-        $obj = $this->get();
-        return clone $obj;
-    }
-
     /**
      * @param AbstractImmutableCollection $collection
      * @return mixed
@@ -231,13 +274,16 @@ abstract class AbstractImmutableCollection implements Countable, ArrayAccess, It
     public function withCollection($collection)
     {
         if (!($collection instanceof static)) {
-            throw new NotInstanceOfException(
-                '$object',
-                static::class,
-                is_object($collection) ? get_class($collection) : gettype($collection)
+            $type = is_object($collection) ? get_class($collection) : gettype($collection);
+            throw new InvalidArgumentException(
+                'Argument $collection must be instance of ' . static::class
+                . " Variable of type `{$type}` supplied instead"
             );
         }
-        return new static(array_merge($this->toArray(), $collection->toArray()));
+        $this->get();
+        $obj = clone $this;
+        $obj->collection = array_merge($this->toArray(), $collection->toArray());
+        return $obj;
     }
 
     /**
@@ -247,8 +293,9 @@ abstract class AbstractImmutableCollection implements Countable, ArrayAccess, It
     public function withValue($value)
     {
         $this->validate($value);
-        $collectionArr = $this->toArray();
-        $collectionArr[] = $value;
-        return new static($collectionArr);
+        $this->get();
+        $obj = clone $this;
+        $obj->collection[] = $value;
+        return $obj;
     }
 }
